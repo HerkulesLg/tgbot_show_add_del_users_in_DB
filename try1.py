@@ -52,7 +52,8 @@ def show_db(callback):
             item = ' | '.join(item)
             db_message += f'{user_count}. @{item}\n'
             user_count += 1
-            bot.send_message(callback.message.chat.id, text=db_message)
+        bot.send_message(callback.message.chat.id, text=db_message)
+    start(callback.message)
 
 
 # записывает данные пользователя в БД заранее проверяя есть ли он в БД
@@ -76,6 +77,7 @@ def add_record(callback):
         conn.commit()
         conn.close()
         bot.send_message(callback.message.chat.id, text='Добавил твою запись')
+    start(callback.message)
 
 
 # удаление из БД записи
@@ -84,21 +86,26 @@ def add_record(callback):
 def del_record_quest(callback):
     conn = sqlite3.connect('database.db')
     curs = conn.cursor()
-    curs.execute("SELECT username FROM users")
-    user_list = curs.fetchall()
-    bot.send_message(callback.message.chat.id, 'Введите username без "@". Чтобы удалить этого человека из БД.')
+    curs.execute("SELECT id FROM users")
+    id_list = curs.fetchall()
+    bot.send_message(callback.message.chat.id, 'Введите id, это самое последнее значение в строчке БД. Чтобы удалить '
+                                               'этого человека.')
+    conn.close()
 
     # проверка ввода и удаление записи
     @bot.message_handler(content_types=['text'])
     def del_record(message):
-        if message.text in f'@{user_list}':
+        conn = sqlite3.connect('database.db')
+        curs = conn.cursor()
+        if message.text.strip() in f'{id_list}':
+            curs.execute(f"DELETE FROM users WHERE id = '{message.text}';")
             bot.send_message(message.chat.id, 'Готово, удалил')
-            curs.execute(f"DELETE FROM users WHERE username = '{message.text}';")
             conn.commit()
             conn.close()
         else:
             bot.send_message(message.chat.id, 'Такого пользователя нет. Или вы ввели неправильный формат.\nВведите '
-                                              'username без "@".')
+                                              'id, это самое последнее значение в строчке БД.')
+        start(message)
 
 
 bot.polling()
