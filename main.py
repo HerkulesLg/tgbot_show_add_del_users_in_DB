@@ -81,7 +81,7 @@ def add_record(callback):
 
 
 # удаление из БД записи
-# запрос никнейма
+# запрос id
 @bot.callback_query_handler(func=lambda callback: callback.data == 'del_record')
 def del_record_quest(callback):
     conn = sqlite3.connect('database.db')
