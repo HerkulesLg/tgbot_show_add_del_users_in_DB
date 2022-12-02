@@ -4,7 +4,7 @@ import os
 from telebot import types
 
 # подключение бота
-bot = telebot.TeleBot('token')
+bot = telebot.TeleBot('5589060793:AAEvkZKe9PqfXaJDk0BTqHt8jrK92XwZ5pQ')
 # проверка если нет файла БД + создание файла БД
 if not os.path.exists('database.db'):
     conn = sqlite3.connect('database.db')
@@ -64,12 +64,12 @@ def add_record(callback):
     conn = sqlite3.connect('database.db')
     curs = conn.cursor()
     # Проверка через SELECT
-    curs.execute(f"SELECT username FROM users WHERE username = '{callback.from_user.username}'")
+    curs.execute(f"SELECT username FROM users WHERE username = ?", [callback.from_user.username])
     # Если уже есть в БД
     if curs.fetchall():
         bot.send_message(callback.message.chat.id, text='Ты уже был записан. Посмотри БД')
     # Если нет в БД
-    elif not curs.fetchall():
+    else:
         curs.execute("""
         INSERT INTO users(username, fname, lname, id)
         VALUES(?, ?, ?, ?);
@@ -98,7 +98,7 @@ def del_record_quest(callback):
         conn = sqlite3.connect('database.db')
         curs = conn.cursor()
         if message.text.strip() in f'{id_list}':
-            curs.execute(f"DELETE FROM users WHERE id = '{message.text}';")
+            curs.execute(f"DELETE FROM users WHERE id = ?;", [message.text])
             bot.send_message(message.chat.id, 'Готово, удалил')
             conn.commit()
             conn.close()
