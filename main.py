@@ -4,7 +4,7 @@ import os
 from telebot import types
 
 # подключение бота
-bot = telebot.TeleBot('5589060793:AAEvkZKe9PqfXaJDk0BTqHt8jrK92XwZ5pQ')
+bot = telebot.TeleBot('token')
 # проверка если нет файла БД + создание файла БД
 if not os.path.exists('database.db'):
     conn = sqlite3.connect('database.db')
